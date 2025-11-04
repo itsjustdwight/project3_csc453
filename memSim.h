@@ -77,6 +77,50 @@ typedef struct {
 
 
 
+// initialize TLB
+void init_tlb(TLB *tlb);
+
+// lookup TLB page
+int tlb_lookup(TLB *tlb, int page_num);
+
+// insert TLB
+void tlb_insert(TLB *tlb, int page_num, int frame_num);
+
+// Invalidates TLB entry
+void tlb_invalidate(TLB *tlb, int page_num);
+
+// initializes page table
+void init_page_table(PageTable *pt);
+
+// looks up page in page table
+int page_table_lookup(PageTable *pt, int page_num);
+
+// insert page table page
+void page_table_insert(PageTable *pt, int page_num, int frame_num);
+
+// delete page table from page
+void page_table_evict(PageTable *pt, int page_num);
+
+// initialize physical memory
+void init_physical_memory(PhysicalMemory *pm, int num_frames);
+
+// check if free frames if not reuturn false
+bool has_free_frame(PhysicalMemory *pm);
+
+// get next free frame 
+int get_free_frame(PhysicalMemory *pm);
+
+//loads page into a specific frame
+void load_page_to_frame(PhysicalMemory *pm, int frame_num, int page_num, unsigned char *page_data);
+
+//initializes fifo queue
+void init_fifo_queue(FIFOQueue *queue, int capacity);
+
+//adds frame into queue
+void fifo_enqueue(FIFOQueue *queue, int frame_num);
+
+//removes frame from queue
+int fifo_dequeue(FIFOQueue *queue);
 
 
 #endif
