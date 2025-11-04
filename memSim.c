@@ -6,7 +6,7 @@
 TLBEntry tlb[TLB_SIZE];
 PageTableEntry page_table[PAGE_TABLE_SIZE];
 char physical_mem[256][FRAME_SIZE];
-FrameInfo frame_info[256];
+Frame frame_info[256];
 int num_frames;
 char *pra_algorithm;
 
