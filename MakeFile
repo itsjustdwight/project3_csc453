@@ -1,24 +1,20 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c99 -g
 TARGET = memSim
-SRC = memsim.c
-
-.PHONY: all clean test
+OBJS = main.o memSim.o
 
 all: $(TARGET)
 
-$(TARGET): $(SRC)
-	$(CC) $(CFLAGS) -o $(TARGET) $(SRC)
-	@echo "Build complete. Run with: ./$(TARGET) <address-file> <frames> <algorithm>"
+$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
+
+main.o: main.c memSim.h
+	$(CC) $(CFLAGS) -c main.c
+
+memSim.o: memSim.c memSim.h
+	$(CC) $(CFLAGS) -c memSim.c
 
 clean:
-	rm -f $(TARGET) *.o
-	@echo "Clean complete."
+	rm -f $(TARGET) $(OBJS)
 
-test: $(TARGET)
-	@echo "Running basic test..."
-	@if [ -f "addresses.txt" ] && [ -f "BACKING_STORE.bin" ]; then \
-		./$(TARGET) addresses.txt 256 fifo | head -15; \
-	else \
-		echo "Test files not found. Please provide addresses.txt and BACKING_STORE.bin"; \
-	fi
+.PHONY: all clean

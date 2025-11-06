@@ -12,7 +12,6 @@
 #define OFFSET_MASK 0xFF
 #define PAGE_MASK 0xFF00
 
-
 typedef struct {
     int page_num;
     int frame_num;
@@ -29,6 +28,7 @@ typedef struct{
 typedef struct{
     int frame_num;
     bool loaded;
+    int last_access_time;
 } PageTableEntry;
 
 typedef struct {
@@ -36,8 +36,9 @@ typedef struct {
 } PageTable;
 
 typedef struct {
-    unsigned char data [FRAME_SIZE];
+    unsigned char data[FRAME_SIZE];
     int page_num;
+    int last_access_time;
 } Frame;
 
 typedef struct {
@@ -75,52 +76,42 @@ typedef struct {
     char algorithm[10];
 } MemorySimulator;
 
-
-
-// initialize TLB
+// TLB functions
 void init_tlb(TLB *tlb);
-
-// lookup TLB page
 int tlb_lookup(TLB *tlb, int page_num);
-
-// insert TLB
 void tlb_insert(TLB *tlb, int page_num, int frame_num);
-
-// Invalidates TLB entry
 void tlb_invalidate(TLB *tlb, int page_num);
 
-// initializes page table
+// Page table functions
 void init_page_table(PageTable *pt);
-
-// looks up page in page table
 int page_table_lookup(PageTable *pt, int page_num);
-
-// insert page table page
 void page_table_insert(PageTable *pt, int page_num, int frame_num);
-
-// delete page table from page
 void page_table_evict(PageTable *pt, int page_num);
 
-// initialize physical memory
+// Physical memory functions
 void init_physical_memory(PhysicalMemory *pm, int num_frames);
-
-// check if free frames if not reuturn false
 bool has_free_frame(PhysicalMemory *pm);
-
-// get next free frame 
 int get_free_frame(PhysicalMemory *pm);
-
-//loads page into a specific frame
 void load_page_to_frame(PhysicalMemory *pm, int frame_num, int page_num, unsigned char *page_data);
 
-//initializes fifo queue
+// FIFO queue functions
 void init_fifo_queue(FIFOQueue *queue, int capacity);
-
-//adds frame into queue
 void fifo_enqueue(FIFOQueue *queue, int frame_num);
-
-//removes frame from queue
 int fifo_dequeue(FIFOQueue *queue);
 
+// LRU functions
+void init_lru_tracker(LRUTracker *lru, int num_frames);
+void lru_update(LRUTracker *lru, int frame_num);
+int lru_find_victim(LRUTracker *lru, PhysicalMemory *pm);
+
+// Backing store functions
+bool load_backing_store(BackingStore *bs, const char *filename);
+void read_page_from_backing_store(BackingStore *bs, int page_num, unsigned char *buffer);
+
+// Simulator functions
+void init_simulator(MemorySimulator *sim, int num_frames, const char *algorithm);
+int translate_address(MemorySimulator *sim, int logical_address, int *addresses, int total_addresses, int current_index);
+void print_stats(MemorySimulator *sim, int total_addresses);
+void cleanup_simulator(MemorySimulator *sim);
 
 #endif
