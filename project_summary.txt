@@ -1,0 +1,33 @@
+OVERVIEW:
+This project implements a virtual memory simulator that translates logical addresses
+to physical addresses using a TLB, page table, physical memory, and backing store.
+Supports three page replacement algorithms: FIFO, LRU, and OPT.
+
+DATA STRUCTURES:
+- TLB: 16-entry Translation Lookaside Buffer with FIFO replacement
+- Page Table: 256 entries tracking loaded pages and frame mappings
+- Physical Memory: Variable frames (1-256), each 256 bytes
+- FIFO Queue: Circular array for frame insertion order
+- LRU Tracker: Access times for least recently used tracking
+- Backing Store: 65,536-byte binary file containing all pages
+
+PAGE REPLACEMENT ALGORITHMS:
+FIFO: Evicts oldest loaded page using circular queue
+LRU: Evicts least recently accessed page using access timestamps
+OPT: Evicts page unused for longest time using lookahead (theoretical minimum)
+
+ADDRESS TRANSLATION PROCESS:
+1. Extract page number (8 bits) and offset (8 bits) from logical address
+2. Check TLB for page-to-frame mapping
+3. On TLB miss, check page table
+4. On page fault: load from backing store, evict victim if needed
+5. Update TLB and page table
+6. Return physical address (frame * 256 + offset)
+
+IMPLEMENTATION HIGHLIGHTS:
+- Modular design with separate TLB, page table, and memory functions
+- Two-pass processing for OPT algorithm (read addresses, then process)
+- Global time counter for LRU access tracking
+- Clean compilation with proper error handling and memory management
+
+All test cases pass with expected page fault rates and TLB hit/miss counts.
