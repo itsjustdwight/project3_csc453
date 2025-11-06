@@ -5,7 +5,7 @@
 
 void print_frame_hex(unsigned char *data, int size) {
     for (int i = 0; i < size; i++) {
-        printf("%02x", data[i]);
+        printf("%02X", data[i]);
     }
 }
 
@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
     // Second pass: process each address
     for (int i = 0; i < total_addresses; i++) {
         int logical_address = addresses[i];
-        int physical_address = translate_address(&sim, logical_address, addresses, total_addresses, i);
+        translate_address(&sim, logical_address, addresses, total_addresses, i);
         
         int page_num = (logical_address >> OFFSET_BITS) & 0xFF;
         int offset = logical_address & OFFSET_MASK;
@@ -88,7 +88,7 @@ int main(int argc, char *argv[]) {
         signed char value = (signed char)sim.physical_memory.frames[frame_num].data[offset];
         
         // Print output: address, value, frame_num, frame_contents
-        printf("%d,%d,%d,", logical_address, value, frame_num);
+        printf("%d, %d, %d, ", logical_address, value, frame_num);
         print_frame_hex(sim.physical_memory.frames[frame_num].data, FRAME_SIZE);
         printf("\n");
     }

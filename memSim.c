@@ -147,7 +147,7 @@ void lru_update(LRUTracker *lru, int frame_num) {
     lru->access_time[frame_num] = lru->current_time;
 }
 
-int lru_find_victim(LRUTracker *lru, PhysicalMemory *pm) {
+int lru_find_victim(LRUTracker *lru __attribute__((unused)), PhysicalMemory *pm) {
     int victim = 0;
     int min_time = pm->frames[0].last_access_time;
     
@@ -300,7 +300,7 @@ int translate_address(MemorySimulator *sim, int logical_address, int *addresses,
 }
 
 void print_stats(MemorySimulator *sim, int total_addresses) {
-    double page_fault_rate = (double)sim->page_faults / total_addresses * 100.0;
+    double page_fault_rate = (double)sim->page_faults / total_addresses;
     double tlb_miss_rate = (double)sim->tlb.misses / total_addresses * 100.0;
     
     printf("Number of Translated Addresses = %d\n", total_addresses);
