@@ -17,4 +17,8 @@ memSim.o: memSim.c memSim.h
 clean:
 	rm -f $(TARGET) $(OBJS)
 
+submission: main.c memSim.c memSim.h Makefile README.txt project_summary.txt
+	tar -cf project2_submission.tar main.c memSim.c memSim.h Makefile README.txt project_summary.txt
+	gzip project_submission.tar
+
 .PHONY: all clean
