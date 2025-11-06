@@ -26,10 +26,24 @@ void init_tlb(TLB *tlb) {
 }
 
 // lookup TLB page
-int tlb_lookup(TLB *tlb, int page_num) {}
+int tlb_lookup(TLB *tlb, int page_num) {
+    for (int i = 0; i < TLB_SIZE; i++) {
+	if (tlb->entries[i].valid && tlb->entries[i].page_num == page_num) {
+	    tlb->hits++
+	    return tlb->entries[i].frame_num;
+	}
+    }
+    tlb->misses++;
+    return -1;
+}
 
 // insert into TLB
-void tlb_insert(TLB *tlb, int page_num, int frame_num) {}
+void tlb_insert(TLB *tlb, int page_num, int frame_num) {
+    tlb->entries[tlb->fifo_index].page_num = page_num; // inserting page number
+    tlb->entries[tlb->fifo_index].frame_num = frame_num; // inserting frame number
+    tlb->entries[tlb->fifo_index].valid = true; // setting valid bit
+    tlb->fifo_index = (tlb->fifo_index + 1) % TLB_SIZE // setting fifo_index to +1 of the TLB_SIZE
+}
 
 // invalidates entry in TLB
 void tlb_invalidate(TLB *tlb, int page_num) {}
@@ -49,7 +63,16 @@ int page_table_lookup(PageTable *pt, int page_num) {}
 void page_table_evict(PageTable *pt, int page_num) {}
 
 // initialize physical memory
-void init_physical_memory(PhysicalMemory *pm, int num_frames) {}
+void init_physical_memory(PhysicalMemory *pm, int num_frames) {
+    pm->num_frames = num_frames;
+    pm->next_free_frame = 0;
+    pm->frames = (Frame *)malloc(num_frames * sizeof(Frame));
+
+    for(int i = 0; i < num_frames; i++) {
+	pm->frames[i].page_num = -1;
+	memset(pm->frames[i].data, 0, FRAME_SIZE);
+    }
+}
 
 // check if free frames, if not return false
 bool has_free_frame(PhysicalMemory *pm) {}
@@ -61,13 +84,34 @@ int get_free_frame(PhysicalMemory *pm) {}
 void load_page_to_frame(PhysicalMemory *pm, int frame_num, int page_num, unsigned char *page_data) {}
 
 // initializes fifo queue
-void init_fifo_queue(FIFOQueue *queue, int capacity) {}
+void init_fifo_queue(FIFOQueue *queue, int capacity) {
+    queue->capacity = capacity;
+    queue->size = 0;
+    queue->front = 0;
+    queue->rear = -1;
+    queue->queue = (int *)malloc(capacity * sizeof(int));
+}
 
 // adds frame into queue
-void fifo_enqueue(FIFOQueue *queue, int frame_num) {}
+void fifo_enqueue(FIFOQueue *queue, int frame_num) {
+    if (queue->size < queue->capacity) {
+	queue->rear = (queue->rear + 1) % queue->capacity;
+	queue->queue[queue->rear] = frame_num;
+	queue->size++;
+    }
+}
 
 // removes frame from queue
-int fifo_dequeue(FIFOQueue *queue) {}
+int fifo_dequeue(FIFOQueue *queue) {
+    if (queue->size == 0) {
+	return -1;
+    }
+
+    int frame_num = queue->queue[queue->front];
+    queue->front = (queue->front + 1) % queue->capacity;
+    queue->size--;
+    return frame_num;
+}
 
 void print_stats(MemorySimulator *sim) {
   double page_fault_rate = (double)sim->page_faults / total_addresses * 100.0;
